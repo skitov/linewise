@@ -77,6 +77,12 @@
   	  (cons (line-beginning-position (- 2 lcount)) (line-beginning-position 2))
   	(cons (line-beginning-position) (line-beginning-position (1+ lcount)))))
 
+
+(defun linewise-call-region-function(region-func)
+  "Calls given region function on affected lines"
+  (let ((bounds (affected-lines-bounds)))
+	(funcall region-func (car bounds) (cdr bounds))))
+
 (defun insert-select(str)
   "Inserts str into buffer, and sets insertion selected excluding trailing linefeed"
   (let ((l (length str)))
