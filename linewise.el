@@ -97,27 +97,23 @@
 
 (defun affected-lines-content()
   "Returns substring between affected lines bounds"
-  (let ((bounds (affected-lines-bounds)))
-  (buffer-substring-no-properties (car bounds) (cdr bounds))))
+  (linewise-call-region-function 'buffer-substring-no-properties))
 
 (defun linewise-delete()
   "Deletes affected lines without putting to kill ring"
   (interactive)
-  (let ((reg-bounds (affected-lines-bounds)))
-  (delete-region (car reg-bounds) (cdr reg-bounds))))
+  (linewise-call-region-function 'delete-region))
 
 (defun linewise-copy()
   "Puts affected lines to kill ring without deleting"
   (interactive)
-	(let ((reg-bounds (affected-lines-bounds)))
-	(kill-ring-save (car reg-bounds) (cdr reg-bounds))
-	(message "Current line(s) copied to kill ring")))
+	(linewise-call-region-function 'kill-ring-save)
+	(message "Current line(s) copied to kill ring"))
 
 (defun linewise-kill()
   "Kills affected lines"
   (interactive)
-  (let ((reg-bounds (affected-lines-bounds)))
-  (kill-region (car reg-bounds) (cdr reg-bounds))))
+  (linewise-call-region-function 'kill-region))
 
 (defun linewise-yank()
   "Yanks to beginning of the current line"
@@ -143,8 +139,7 @@
 (defun linewise-narrow()
   "Narrows buffer to affected lines"
   (interactive)
-  (let ((bounds (affected-lines-bounds)))
-	(narrow-to-region (car bounds) (cdr bounds))))
+  (linewise-call-region-function 'narrow-to-region))
 
 (defun linewise-copy-other-window(&optional keep-window)
   "Copy affected lines to other window. If keep-window is nil, stays in other window. If keep-window is t stays in the same window and lines are inserted without selection, so consequent usage of the command doesn't mix lines. Please do not use for code duplication!"
@@ -202,8 +197,7 @@
 (defun linewise-toggle-comment-out()
   "Comment/uncomment affected lines"
   (interactive)
-  (let ((bounds (affected-lines-bounds)))
-	(comment-or-uncomment-region (car bounds) (cdr bounds))))
+  (linewise-call-region-function 'comment-or-uncomment-region))
 
 (defun linewise-set-hotkeys(redefine-c-l)
   "Sets hotkeys for the package functions. If redefine-c-l is nil, hotkey prefix is set to C-c l. If redefine-c-l is t, prefix is set to C-l"
