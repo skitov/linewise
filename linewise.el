@@ -51,6 +51,7 @@
 ;;   "prefix c" 'linewise-copy                   - put affected lines to kill ring without deleting
 ;;   "prefix y" 'linewise-yank                   - yank at the beginning of current line (yanks previosly killed lines before current)
 ;;   "prefix h" 'linewise-toggle-comment-out     - comment/uncomment affected lines
+;;   "prefix v" 'linewise-eval                   - evaluate affected lines
 ;;   "prefix r" 'linewise-repeat                 - fork affected lines
 ;;   "prefix n" 'linewise-narrow                 - narrow to affected lines
 ;;   "prefix o" 'linewise-copy-other-window      - copy affected lines to other window and stay there
@@ -204,6 +205,11 @@
   (interactive)
   (linewise-call-region-function 'comment-or-uncomment-region))
 
+(defun linewise-eval()
+  "Evaluate affected lines"
+  (interactive)
+  (linewise-call-region-function 'eval-region))
+
 (defun linewise-set-hotkeys(redefine-c-l)
   "Sets hotkeys for the package functions. If redefine-c-l is nil, hotkey prefix is set to C-c l. If redefine-c-l is t, prefix is set to C-l"
   (global-set-key (kbd "<M-S-down>") 'linewise-move-up-or-down)
@@ -216,6 +222,7 @@
 	(global-set-key (kbd (concat prefix " c")) 'linewise-copy)
 	(global-set-key (kbd (concat prefix " y")) 'linewise-yank)
 	(global-set-key (kbd (concat prefix " h")) 'linewise-toggle-comment-out)
+	(global-set-key (kbd (concat prefix " v")) 'linewise-eval)
 	(global-set-key (kbd (concat prefix " r")) 'linewise-repeat)
 	(global-set-key (kbd (concat prefix " n")) 'linewise-narrow)
 	(global-set-key (kbd (concat prefix " o")) 'linewise-copy-other-window)
