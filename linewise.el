@@ -121,20 +121,25 @@
   (move-beginning-of-line 1)
   (yank))
 
-(defun linewise-repeat()
+(defun linewise-repeat(&optional arg)
   "Repeats affected lines, please do not use for code duplication!"
-  (interactive)
+  (interactive "p")
   (let ((bounds (affected-lines-bounds))
 		(start)
 		(finish)
 		(substr))
+	(when (or (not arg) (< arg 1)) (setq arg 1))
 	(setq start (car bounds))
 	(setq finish (cdr bounds))
 	(setq substr (buffer-substring start finish))
 	(goto-char finish)
 	(when (not (= ?\n (char-before finish)))
 	  (insert "\n"))
-	(insert-select substr)))
+	(while (> arg 0)
+	  (insert-select substr)
+	  (setq arg (- arg 1))
+	  (when (> arg 0)
+		(right-char)))))
 
 (defun linewise-narrow()
   "Narrows buffer to affected lines"
