@@ -54,6 +54,7 @@
 ;;   "prefix v" 'linewise-eval                   - evaluate affected lines
 ;;   "prefix r" 'linewise-repeat                 - fork affected lines
 ;;   "prefix n" 'linewise-narrow                 - narrow to affected lines
+;;   "prefix RET" 'linewise-newline              - insert new line above the current line, put point to the new line and indent.
 ;;   "prefix TAB" 'linewise-indent               - indent affected lines
 ;;   "prefix o" 'linewise-copy-other-window      - copy affected lines to other window and stay there
 ;;   "prefix C-o" '(lambda() (interactive) (linewise-copy-other-window t)) - copy affected lines to other window and return back to initial window
@@ -148,6 +149,14 @@
   (interactive)
   (linewise-call-region-function 'narrow-to-region))
 
+(defun linewise-newline()
+  "Inserts new line above the current line"
+  (interactive)
+  (goto-char (line-beginning-position))
+  (newline-and-indent)
+  (previous-line)
+  (indent-for-tab-command))
+
 (defun linewise-copy-other-window(&optional keep-window)
   "Copy affected lines to other window. If keep-window is nil, stays in other window. If keep-window is t stays in the same window and lines are inserted without selection, so consequent usage of the command doesn't mix lines. Please do not use for code duplication!"
   (interactive)
@@ -231,6 +240,7 @@
 	(global-set-key (kbd (concat prefix " v")) 'linewise-eval)
 	(global-set-key (kbd (concat prefix " r")) 'linewise-repeat)
 	(global-set-key (kbd (concat prefix " n")) 'linewise-narrow)
+	(global-set-key (kbd (concat prefix " RET")) 'linewise-newline)
 	(global-set-key (kbd (concat prefix " TAB")) 'linewise-indent)
 	(global-set-key (kbd (concat prefix " o")) 'linewise-copy-other-window)
 	(global-set-key (kbd (concat prefix " C-o")) '(lambda() (interactive) (linewise-copy-other-window t)))))
