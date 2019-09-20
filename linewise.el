@@ -91,7 +91,7 @@
 	  (setq str (concat str "\n")))
 	(insert str)
 	(goto-char (- (point) 1))
-	(when (> (count-lines (- (point) l) (point)) 1)
+	(when (> (count-lines-region-with-empty-last) 1)
 	  (setq deactivate-mark nil)
 	  (push-mark (- (point) l) nil t))))
 
