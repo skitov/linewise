@@ -54,6 +54,7 @@
 ;;   "prefix v" 'linewise-eval                   - evaluate affected lines
 ;;   "prefix r" 'linewise-repeat                 - fork affected lines
 ;;   "prefix n" 'linewise-narrow                 - narrow to affected lines
+;;   "prefix TAB" 'linewise-indent               - indent affected lines
 ;;   "prefix o" 'linewise-copy-other-window      - copy affected lines to other window and stay there
 ;;   "prefix C-o" '(lambda() (interactive) (linewise-copy-other-window t)) - copy affected lines to other window and return back to initial window
 ;;
@@ -210,6 +211,11 @@
   (interactive)
   (linewise-call-region-function 'eval-region))
 
+(defun linewise-indent()
+  "Indent affected lines"
+  (interactive)
+  (linewise-call-region-function 'indent-region))
+
 (defun linewise-set-hotkeys(redefine-c-l)
   "Sets hotkeys for the package functions. If redefine-c-l is nil, hotkey prefix is set to C-c l. If redefine-c-l is t, prefix is set to C-l"
   (global-set-key (kbd "<M-S-down>") 'linewise-move-up-or-down)
@@ -225,6 +231,7 @@
 	(global-set-key (kbd (concat prefix " v")) 'linewise-eval)
 	(global-set-key (kbd (concat prefix " r")) 'linewise-repeat)
 	(global-set-key (kbd (concat prefix " n")) 'linewise-narrow)
+	(global-set-key (kbd (concat prefix " TAB")) 'linewise-indent)
 	(global-set-key (kbd (concat prefix " o")) 'linewise-copy-other-window)
 	(global-set-key (kbd (concat prefix " C-o")) '(lambda() (interactive) (linewise-copy-other-window t)))))
 
