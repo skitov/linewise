@@ -58,7 +58,7 @@
 ;;
 
 
-(defun line-count-ignore-linebeg ()
+(defun count-lines-region-with-empty-last ()
   "line-count in region, including empty last line"
   (if (and transient-mark-mode mark-active)
 	  (let (l)
@@ -72,7 +72,7 @@
 (defun affected-lines-bounds()
   "Returns list of two elements, where first element is beginning of affected lines, second is end of affected lines"
   (defvar lcount)
-  (setq lcount (line-count-ignore-linebeg))
+  (setq lcount (count-lines-region-with-empty-last))
   (if (and (mark) (< (mark) (point)))
   	  (cons (line-beginning-position (- 2 lcount)) (line-beginning-position 2))
   	(cons (line-beginning-position) (line-beginning-position (1+ lcount)))))
