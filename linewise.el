@@ -75,20 +75,19 @@
 			 (eval 'l)))
 	1))
 
-(defun affected-lines-bounds()
+(defun linewise-affected-lines-bounds()
   "Returns bounds of affected lines.
  bounds are list of two elements,
  where first element is beginning of affected lines,
  second is end of affected lines."
-  (defvar lcount)
-  (setq lcount (count-lines-region-with-empty-last))
-  (if (and (mark) (< (mark) (point)))
-  	  (cons (line-beginning-position (- 2 lcount)) (line-beginning-position 2))
-  	(cons (line-beginning-position) (line-beginning-position (1+ lcount)))))
+  (let ((lcount (count-lines-region-with-empty-last)))
+	(if (and (mark) (< (mark) (point)))
+  		(cons (line-beginning-position (- 2 lcount)) (line-beginning-position 2))
+  	  (cons (line-beginning-position) (line-beginning-position (1+ lcount))))))
 
 (defun linewise-call-region-function(region-func)
   "Calls given region function on affected lines."
-  (let ((bounds (affected-lines-bounds)))
+  (let ((bounds (linewise-affected-lines-bounds)))
 	(funcall region-func (car bounds) (cdr bounds))))
 
 (defun linewise-insert-select(str)
@@ -134,7 +133,7 @@
   "Repeats affected lines.
  Please do not use for code duplication!"
   (interactive "p")
-  (let ((bounds (affected-lines-bounds))
+  (let ((bounds (linewise-affected-lines-bounds))
 		(start)
 		(finish)
 		(substr))
@@ -161,7 +160,7 @@
   (interactive)
   (goto-char (line-beginning-position))
   (newline-and-indent)
-  (previous-line)
+  (forward-line -1)
   (indent-for-tab-command))
 
 (defun linewise-copy-other-window(&optional keep-window)
@@ -171,14 +170,13 @@
  are inserted without selection, so consequent usage of
  the command doesn't mix lines. Please do not use for code duplication!"
   (interactive)
-  (defvar content)
-  (setq content (linewise-affected-lines-content))
-  (other-window 1)
-  (goto-char (line-beginning-position))
-  (if keep-window
-	  ;; When keeping window, next copying of lines should after these lines, but not in between.
-	  (progn (insert content) (other-window -1))
-	(linewise-insert-select content)))
+  (let ((content (linewise-affected-lines-content)))
+	(other-window 1)
+	(goto-char (line-beginning-position))
+	(if keep-window
+		;; When keeping window, next copying of lines should after these lines, but not in between.
+		(progn (insert content) (other-window -1))
+	  (linewise-insert-select content))))
 
 (defun linewise-move-up-or-down(arg)
   "Shifts lines affected by selection arg lines down.
@@ -191,7 +189,7 @@
   (defvar substr-end)
   (defvar substr-bounds)
   (defvar sub-str)
-  (setq substr-bounds (affected-lines-bounds))
+  (setq substr-bounds (linewise-affected-lines-bounds))
   (setq substr-beginning (car substr-bounds))
   (setq substr-end (cdr substr-bounds))
   (defvar move-possible)
