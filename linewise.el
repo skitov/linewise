@@ -57,7 +57,7 @@
 ;;   "prefix RET" 'linewise-newline              - insert new line above the current line, put point to the new line and indent.
 ;;   "prefix TAB" 'linewise-indent               - indent selected lines
 ;;   "prefix o" 'linewise-copy-other-window      - copy selected lines to other window and stay there
-;;   "prefix C-o" '(lambda() (interactive) (linewise-copy-other-window t)) - copy selected lines to other window and return back to initial window
+;;   "prefix C-o" #'(lambda() (interactive) (linewise-copy-other-window t)) - copy selected lines to other window and return back to initial window
 ;;
 
 
@@ -86,7 +86,6 @@
   	  (cons (line-beginning-position (- 2 lcount)) (line-beginning-position 2))
   	(cons (line-beginning-position) (line-beginning-position (1+ lcount)))))
 
-
 (defun linewise-call-region-function(region-func)
   "Calls given region function on affected lines."
   (let ((bounds (affected-lines-bounds)))
@@ -105,7 +104,7 @@
 	  (setq deactivate-mark nil)
 	  (push-mark (- (point) l) nil t))))
 
-(defun affected-lines-content()
+(defun linewise-affected-lines-content()
   "Returns substring between affected lines bounds."
   (linewise-call-region-function 'buffer-substring-no-properties))
 
@@ -126,7 +125,7 @@
   (linewise-call-region-function 'kill-region))
 
 (defun linewise-yank()
-  "Yanks to beginning of the current line".
+  "Yanks to beginning of the current line."
   (interactive)
   (move-beginning-of-line 1)
   (yank))
@@ -173,7 +172,7 @@
  the command doesn't mix lines. Please do not use for code duplication!"
   (interactive)
   (defvar content)
-  (setq content (affected-lines-content))
+  (setq content (linewise-affected-lines-content))
   (other-window 1)
   (goto-char (line-beginning-position))
   (if keep-window
@@ -261,7 +260,7 @@
 	(global-set-key (kbd (concat prefix " RET")) 'linewise-newline)
 	(global-set-key (kbd (concat prefix " TAB")) 'linewise-indent)
 	(global-set-key (kbd (concat prefix " o")) 'linewise-copy-other-window)
-	(global-set-key (kbd (concat prefix " C-o")) '(lambda() (interactive) (linewise-copy-other-window t)))))
+	(global-set-key (kbd (concat prefix " C-o")) #'(lambda() (interactive) (linewise-copy-other-window t)))))
 
 (provide 'linewise)
 
