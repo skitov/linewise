@@ -246,22 +246,22 @@ otherwise moved lines stay selected from beginning to end.
 Hotkeys will start with PREFIX,
 except for moves of affected lines 1 line up or down.
 Assigned keys will be:
-- `M-N' 'linewise-move-up-or-down'
-- `M-P' 'linewise-move-up'
-- PREFIX `C-n' 'linewise-move-down-fast'
-- PREFIX `C-p' 'linewise-move-up-fast'
-- PREFIX `k' 'linewise-kill'
-- PREFIX `d' 'linewise-delete'
-- PREFIX `c' 'linewise-copy'
-- PREFIX `y' 'linewise-yank'
-- PREFIX `h' 'linewise-toggle-comment-out'
-- PREFIX `v' 'linewise-eval'
-- PREFIX `r' 'linewise-repeat'
-- PREFIX `n' 'linewise-narrow'
-- PREFIX `RET' 'linewise-newline'
-- PREFIX `TAB' 'linewise-indent'
-- PREFIX `o' 'linewise-copy-other-window'
-- PREFIX `C-o' 'linewise-copy-other-window' with t as argument,
+- `M-N' `linewise-move-up-or-down'
+- `M-P' `linewise-move-up'
+- PREFIX `C-n' `linewise-move-down-fast'
+- PREFIX `C-p' `linewise-move-up-fast'
+- PREFIX `k' `linewise-kill'
+- PREFIX `d' `linewise-delete'
+- PREFIX `c' `linewise-copy'
+- PREFIX `y' `linewise-yank'
+- PREFIX `h' `linewise-toggle-comment-out'
+- PREFIX `v' `linewise-eval'
+- PREFIX `r' `linewise-repeat'
+- PREFIX `n' `linewise-narrow'
+- PREFIX `RET' `linewise-newline'
+- PREFIX `TAB' `linewise-indent'
+- PREFIX `o' `linewise-copy-other-window'
+- PREFIX `C-o' `linewise-copy-other-window' with t as argument,
  meaning staying in the
   same window"
   (global-set-key (kbd "M-N") 'linewise-move-up-or-down)
