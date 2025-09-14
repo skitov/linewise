@@ -26,7 +26,7 @@
 ;; Author: Sergey Kitov
 ;; URL: http://github.com/skitov/linewise
 ;; Version: 1.0
-;; Package-Requires: ((emacs "24.1"))
+;; Package-Requires: ((Emacs "24.1"))
 ;;
 ;; All functions of the package deal with "selected lines".
 ;; The definition of selected lines:
