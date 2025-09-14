@@ -1,5 +1,7 @@
 ;;; linewise.el --- set of functions for linewise editing, whole lines are always affected, lines are defined by mark and point.
 
+;;; Commentary:
+;;
 ;;
 ;; Copyright (C) 2017 by Sergey Kitov
 ;;
@@ -29,23 +31,23 @@
 ;; The definition of selected lines:
 ;; - If (and transient-mark-mode mark-active), region, extended to include all the lines intersecting with region, including trailing linefeed.
 ;; - Otherwise, line containing point including trailing linefeed.
-;; 
+;;
 ;; Get the code:
 ;;
 ;;   git clone https://github.com/skitov/linewise
 ;;
-;; and add the following to your emacs config:
+;; and add the following to your Emacs config:
 ;;
 ;;   (add-to-list 'load-path "~/path/to/linwise")
 ;;   (require 'linewise)
 ;;   If you want to add suggested keybinding add:
-;;   (linewise-set-hotkeys) ;; prefix will be "C-c l"
+;;   (linewise-set-hotkeys "prefix")
 ;;   or:
 ;;   (linewise-set-hotkeys t) ;; prefix will be "C-l", original "C-l" will be unset
-;;   "<M-S-down>" 'linewise-move-up-or-down      - moves selected lines by number of lines specified by prefix arg
-;;   "<M-S-up>" 'linewise-move-up                - moves selected lines one line up
-;;   "<escape> <down>" 'linewise-move-down-fast  - moves selected lines 10 lines down
-;;   "<escape> <up>" 'linewise-move-up-fast      - moves selected lines 10 lines up
+;;   "<M-N>" 'linewise-move-up-or-down      - moves selected lines by number of lines specified by prefix arg
+;;   "<M-P>" 'linewise-move-up                - moves selected lines one line up
+;;   "prefix C-n" 'linewise-move-down-fast  - moves selected lines 10 lines down
+;;   "prefix C-p" 'linewise-move-up-fast      - moves selected lines 10 lines up
 ;;   "prefix k" 'linewise-kill                   - kill selected lines
 ;;   "prefix d" 'linewise-delete                 - delete selected lines without adding to kill ring
 ;;   "prefix c" 'linewise-copy                   - put selected lines to kill ring without deleting
@@ -62,10 +64,11 @@
 
 
 
+
 ;;; Code:
 
 (defun count-lines-region-with-empty-last ()
-  "line-count in region, including empty last line."
+  "Line-count in region, including empty last line."
   (if (and transient-mark-mode mark-active)
 	  (let (l)
 		(setq l (count-lines (region-beginning) (region-end)))
@@ -76,23 +79,23 @@
 	1))
 
 (defun linewise-affected-lines-bounds()
-  "Returns bounds of affected lines.
- bounds are list of two elements,
- where first element is beginning of affected lines,
- second is end of affected lines."
+  "Return bounds of affected lines.
+bounds are list of two elements,
+where first element is beginning of affected lines,
+second is end of affected lines."
   (let ((lcount (count-lines-region-with-empty-last)))
 	(if (and (mark) (< (mark) (point)))
-  		(cons (line-beginning-position (- 2 lcount)) (line-beginning-position 2))
-  	  (cons (line-beginning-position) (line-beginning-position (1+ lcount))))))
+		(cons (line-beginning-position (- 2 lcount)) (line-beginning-position 2))
+	  (cons (line-beginning-position) (line-beginning-position (1+ lcount))))))
 
 (defun linewise-call-region-function(region-func)
-  "Calls given region function on affected lines."
+  "Call REGION-FUNC function with bounds of affected lines as arguments."
   (let ((bounds (linewise-affected-lines-bounds)))
 	(funcall region-func (car bounds) (cdr bounds))))
 
 (defun linewise-insert-select(str)
-  "Inserts str into buffer, and sets insertion selected.
- Trailing linefeed is excluded from selection since it would add extra line."
+  "Insert STR into buffer, and set insertion selected.
+Trailing linefeed is excluded from selection since it would add extra line."
   (let ((l (length str)))
 	(if (= (aref str (- l 1)) ?\n)
 		(setq l (- l 1))
@@ -104,34 +107,34 @@
 	  (push-mark (- (point) l) nil t))))
 
 (defun linewise-affected-lines-content()
-  "Returns substring between affected lines bounds."
+  "Return substring between affected lines bounds."
   (linewise-call-region-function 'buffer-substring-no-properties))
 
 (defun linewise-delete()
-  "Deletes affected lines without putting to kill ring."
+  "Delete affected lines without putting to kill ring."
   (interactive)
   (linewise-call-region-function 'delete-region))
 
 (defun linewise-copy()
-  "Puts affected lines to kill ring without deleting."
+  "Put affected lines to kill ring without deleting."
   (interactive)
 	(linewise-call-region-function 'kill-ring-save)
 	(message "Current line(s) copied to kill ring"))
 
 (defun linewise-kill()
-  "Kills affected lines."
+  "Kill affected lines."
   (interactive)
   (linewise-call-region-function 'kill-region))
 
 (defun linewise-yank()
-  "Yanks to beginning of the current line."
+  "Yank to beginning of the current line."
   (interactive)
   (move-beginning-of-line 1)
   (yank))
 
 (defun linewise-repeat(&optional arg)
-  "Repeats affected lines.
- Please do not use for code duplication!"
+  "Repeat affected lines.  Make ARG copies If ARG is provided.
+Please do not use for code duplication!"
   (interactive "p")
   (let ((bounds (linewise-affected-lines-bounds))
 		(start)
@@ -151,12 +154,12 @@
 		(right-char)))))
 
 (defun linewise-narrow()
-  "Narrows buffer to selected lines."
+  "Narrow buffer to selected lines."
   (interactive)
   (linewise-call-region-function 'narrow-to-region))
 
 (defun linewise-newline()
-  "Inserts new line above the current line."
+  "Insert new line above the current line."
   (interactive)
   (goto-char (line-beginning-position))
   (newline-and-indent)
@@ -165,10 +168,10 @@
 
 (defun linewise-copy-other-window(&optional keep-window)
   "Copy affected lines to other window.
- If keep-window is nil, stays in other window.
- If keep-window is t stays in the same window and lines
- are inserted without selection, so consequent usage of
- the command doesn't mix lines. Please do not use for code duplication!"
+If KEEP-WINDOW is nil, stays in other window.
+If KEEP-WINDOW is t stays in the same window and lines
+are inserted without selection, so consequent usage of
+the command doesn't mix lines.  Please do not use for code duplication!"
   (interactive)
   (let ((content (linewise-affected-lines-content)))
 	(other-window 1)
@@ -179,11 +182,11 @@
 	  (linewise-insert-select content))))
 
 (defun linewise-move-up-or-down(arg)
-  "Shifts lines affected by selection arg lines down.
- Non-positive argument moves lines up.
- If selection is within one line, selection is discarded,
- otherwise moved lines stay selected from beginning to end.
- 0 argument is 1 line up."
+  "Shift lines affected by selection ARG lines down.
+Non-positive argument moves lines up.
+If selection is within one line, selection is discarded,
+otherwise moved lines stay selected from beginning to end.
+0 argument is 1 line up."
   (interactive "p")
   (defvar substr-beginning)
   (defvar substr-end)
@@ -203,23 +206,23 @@
 
   ;; Don't move if we are already at bounds of the buffer.
   (when move-possible
-    (setq sub-str (buffer-substring substr-beginning substr-end))
-    (delete-region substr-beginning substr-end)
+	(setq sub-str (buffer-substring substr-beginning substr-end))
+	(delete-region substr-beginning substr-end)
 	(move-beginning-of-line (if (> arg 0) (1+ arg) arg))
-    (linewise-insert-select sub-str)))
+	(linewise-insert-select sub-str)))
 
 (defun linewise-move-up()
-  "linewise-move-up-or-down with 0 argument."
+  "Call `linewise-move-up-or-down' with 0 argument."
   (interactive)
   (linewise-move-up-or-down 0))
 
 (defun linewise-move-up-fast()
-  "linewise-move-up-or-down with -9 argument."
+  "Call `linewise-move-up-or-down' with -9 argument."
   (interactive)
   (linewise-move-up-or-down -9))
 
 (defun linewise-move-down-fast()
-  "linewise-move-up-or-down with 10 argument."
+  "Call `linewise-move-up-or-down' with 10 argument."
   (interactive)
   (linewise-move-up-or-down 10))
 
@@ -239,9 +242,28 @@
   (linewise-call-region-function 'indent-region))
 
 (defun linewise-set-hotkeys(prefix)
-  "Sets hotkeys for the package functions.
- If redefine-c-l is nil, hotkey prefix is set to C-c l.
- If redefine-c-l is t, prefix is set to C-l."
+  "Set hotkeys for the package functions.
+Hotkeys will start with PREFIX,
+except for moves of affected lines 1 line up or down.
+Assigned keys will be:
+- `M-N' 'linewise-move-up-or-down'
+- `M-P' 'linewise-move-up'
+- PREFIX `C-n' 'linewise-move-down-fast'
+- PREFIX `C-p' 'linewise-move-up-fast'
+- PREFIX `k' 'linewise-kill'
+- PREFIX `d' 'linewise-delete'
+- PREFIX `c' 'linewise-copy'
+- PREFIX `y' 'linewise-yank'
+- PREFIX `h' 'linewise-toggle-comment-out'
+- PREFIX `v' 'linewise-eval'
+- PREFIX `r' 'linewise-repeat'
+- PREFIX `n' 'linewise-narrow'
+- PREFIX `RET' 'linewise-newline'
+- PREFIX `TAB' 'linewise-indent'
+- PREFIX `o' 'linewise-copy-other-window'
+- PREFIX `C-o' 'linewise-copy-other-window' with t as argument,
+ meaning staying in the
+  same window"
   (global-set-key (kbd "M-N") 'linewise-move-up-or-down)
   (global-set-key (kbd "M-P") 'linewise-move-up)
   (global-set-key (kbd (concat prefix " C-n")) 'linewise-move-down-fast)
