@@ -1,4 +1,4 @@
-;;; linewise.el --- set of functions for linewise editing, whole lines are always affected, lines are defined by mark and point.
+;;; linewise.el --- Set of functions for linewise editing
 
 ;;; Commentary:
 ;;
@@ -26,6 +26,7 @@
 ;; Author: Sergey Kitov
 ;; URL: http://github.com/skitov/linewise
 ;; Version: 1.0
+;; Package-Requires: ((emacs "24.1"))
 ;;
 ;; All functions of the package deal with "selected lines".
 ;; The definition of selected lines:
@@ -67,7 +68,7 @@
 
 ;;; Code:
 
-(defun count-lines-region-with-empty-last ()
+(defun linewise-count-lines-region-with-empty-last ()
   "Line-count in region, including empty last line."
   (if (and transient-mark-mode mark-active)
 	  (let (l)
@@ -83,7 +84,7 @@
 bounds are list of two elements,
 where first element is beginning of affected lines,
 second is end of affected lines."
-  (let ((lcount (count-lines-region-with-empty-last)))
+  (let ((lcount (linewise-count-lines-region-with-empty-last)))
 	(if (and (mark) (< (mark) (point)))
 		(cons (line-beginning-position (- 2 lcount)) (line-beginning-position 2))
 	  (cons (line-beginning-position) (line-beginning-position (1+ lcount))))))
@@ -102,7 +103,7 @@ Trailing linefeed is excluded from selection since it would add extra line."
 	  (setq str (concat str "\n")))
 	(insert str)
 	(goto-char (- (point) 1))
-	(when (> (count-lines-region-with-empty-last) 1)
+	(when (> (linewise-count-lines-region-with-empty-last) 1)
 	  (setq deactivate-mark nil)
 	  (push-mark (- (point) l) nil t))))
 
