@@ -1,4 +1,4 @@
-;;; linewise.el --- Set of functions for linewise editing
+;;; linewise.el --- Set of functions for linewise editing  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;;
@@ -30,7 +30,8 @@
 ;;
 ;; All functions of the package deal with "selected lines".
 ;; The definition of selected lines:
-;; - If (and transient-mark-mode mark-active), region, extended to include all the lines intersecting with region, including trailing linefeed.
+;; - If (and transient-mark-mode mark-active), region, extended to include
+;; all the lines intersecting with region, including trailing linefeed.
 ;; - Otherwise, line containing point including trailing linefeed.
 ;;
 ;; Get the code:
@@ -43,8 +44,6 @@
 ;;   (require 'linewise)
 ;;   If you want to add suggested keybinding add:
 ;;   (linewise-set-hotkeys "prefix")
-;;   or:
-;;   (linewise-set-hotkeys t) ;; prefix will be "C-l", original "C-l" will be unset
 ;;   "<M-N>" 'linewise-move-up-or-down      - moves selected lines by number of lines specified by prefix arg
 ;;   "<M-P>" 'linewise-move-up                - moves selected lines one line up
 ;;   "prefix C-n" 'linewise-move-down-fast  - moves selected lines 10 lines down
