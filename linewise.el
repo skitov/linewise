@@ -26,7 +26,7 @@
 ;; Author: Sergey Kitov
 ;; URL: http://github.com/skitov/linewise
 ;; Version: 1.0
-;; Package-Requires: ((Emacs "24.1"))
+;; Package-Requires: (Emacs "24.1")
 ;;
 ;; All functions of the package deal with "selected lines".
 ;; The definition of selected lines:
@@ -43,7 +43,7 @@
 ;;   (add-to-list 'load-path "~/path/to/linwise")
 ;;   (require 'linewise)
 ;;   If you want to add suggested keybinding add:
-;;   (linewise-set-hotkeys "prefix")
+;;   (linewise-set-keybindings "prefix")
 ;;   "<M-N>" 'linewise-move-up-or-down      - moves selected lines by number of lines specified by prefix arg
 ;;   "<M-P>" 'linewise-move-up                - moves selected lines one line up
 ;;   "prefix C-n" 'linewise-move-down-fast  - moves selected lines 10 lines down
@@ -70,12 +70,11 @@
 (defun linewise-count-lines-region-with-empty-last ()
   "Line-count in region, including empty last line."
   (if (and transient-mark-mode mark-active)
-	  (let (l)
-		(setq l (count-lines (region-beginning) (region-end)))
-		   (if (or (= (region-beginning) (region-end))
-				   (= ?\n (char-before (region-end))))
-			   (1+ l)
-			 (eval 'l)))
+	  (let ((l (count-lines (region-beginning) (region-end))))
+		(if (or (= (region-beginning) (region-end))
+				(= ?\n (char-before (region-end))))
+			(1+ l)
+		  (eval 'l)))
 	1))
 
 (defun linewise-affected-lines-bounds()
@@ -161,7 +160,7 @@ Please do not use for code duplication!"
 (defun linewise-newline()
   "Insert new line above the current line."
   (interactive)
-  (goto-char (line-beginning-position))
+  (beginning-of-line)
   (newline-and-indent)
   (forward-line -1)
   (indent-for-tab-command))
@@ -175,7 +174,7 @@ the command doesn't mix lines.  Please do not use for code duplication!"
   (interactive)
   (let ((content (linewise-affected-lines-content)))
 	(other-window 1)
-	(goto-char (line-beginning-position))
+	(beginning-of-line)
 	(if keep-window
 		;; When keeping window, next copying of lines should after these lines, but not in between.
 		(progn (insert content) (other-window -1))
@@ -199,7 +198,7 @@ otherwise moved lines stay selected from beginning to end.
   (save-excursion
 	(if (> arg 0)
 		(progn (goto-char substr-end)
-			   (setq move-possible (and (< (point) (point-max))
+			   (setq move-possible (and (not (eobp))
 										(= (count-lines (point) (line-beginning-position (1+ arg))) arg))))
 	  (progn (goto-char substr-beginning)
 			 (setq move-possible (= (count-lines (line-beginning-position arg) (point)) (- 1 arg))))))
@@ -241,29 +240,33 @@ otherwise moved lines stay selected from beginning to end.
   (interactive)
   (linewise-call-region-function 'indent-region))
 
-(defun linewise-set-hotkeys(prefix)
-  "Set hotkeys for the package functions.
-Hotkeys will start with PREFIX,
+(defun linewise-set-keybindings(prefix)
+  "Set keybindings for the package functions.
+Add
+Keybindings will start with PREFIX,
 except for moves of affected lines 1 line up or down.
 Assigned keys will be:
-- `M-N' `linewise-move-up-or-down'
-- `M-P' `linewise-move-up'
-- PREFIX `C-n' `linewise-move-down-fast'
-- PREFIX `C-p' `linewise-move-up-fast'
-- PREFIX `k' `linewise-kill'
-- PREFIX `d' `linewise-delete'
-- PREFIX `c' `linewise-copy'
-- PREFIX `y' `linewise-yank'
-- PREFIX `h' `linewise-toggle-comment-out'
-- PREFIX `v' `linewise-eval'
-- PREFIX `r' `linewise-repeat'
-- PREFIX `n' `linewise-narrow'
-- PREFIX `RET' `linewise-newline'
-- PREFIX `TAB' `linewise-indent'
-- PREFIX `o' `linewise-copy-other-window'
-- PREFIX `C-o' `linewise-copy-other-window' with t as argument,
- meaning staying in the
-  same window"
+
+  M-N         `linewise-move-up-or-down'
+  M-P         `linewise-move-up'
+  PREFIX C-n  `linewise-move-down-fast'
+  PREFIX C-p  `linewise-move-up-fast'
+  PREFIX k    `linewise-kill'
+  PREFIX d    `linewise-delete'
+  PREFIX c    `linewise-copy'
+  PREFIX y    `linewise-yank'
+  ...
+  PREFIX h    `linewise-toggle-comment-out'
+  PREFIX v    `linewise-eval'
+  PREFIX r    `linewise-repeat'
+  PREFIX n    `linewise-narrow'
+  PREFIX RET  `linewise-newline'
+  PREFIX TAB  `linewise-indent'
+  PREFIX o    `linewise-copy-other-window'
+  PREFIX C-o  `linewise-copy-other-window' with t as argument,
+meaning staying in the
+same window
+..."
   (global-set-key (kbd "M-N") 'linewise-move-up-or-down)
   (global-set-key (kbd "M-P") 'linewise-move-up)
   (global-set-key (kbd (concat prefix " C-n")) 'linewise-move-down-fast)
