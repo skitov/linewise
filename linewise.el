@@ -74,7 +74,7 @@
 		(if (or (= (region-beginning) (region-end))
 				(= ?\n (char-before (region-end))))
 			(1+ l)
-		  (eval 'l)))
+		  l))
 	1))
 
 (defun linewise-affected-lines-bounds()
