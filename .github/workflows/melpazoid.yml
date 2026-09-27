@@ -29,3 +29,5 @@ jobs:
         # set this to false (or remove it) if the package isn't on MELPA:
         EXIST_OK: false
       run: echo $GITHUB_REF && make -C ~/melpazoid
+    - name: Run unit tests
+      run: make test

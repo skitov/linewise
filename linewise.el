@@ -70,12 +70,12 @@
 (defun linewise-count-lines-region-with-empty-last ()
   "Line-count in region, including empty last line."
   (if (and transient-mark-mode mark-active)
-	  (let ((l (count-lines (region-beginning) (region-end))))
-		(if (or (= (region-beginning) (region-end))
-				(= ?\n (char-before (region-end))))
-			(1+ l)
-		  l))
-	1))
+    (let ((l (count-lines (region-beginning) (region-end))))
+      (if (or (= (region-beginning) (region-end))
+            (= ?\n (char-before (region-end))))
+        (1+ l)
+        l))
+        1))
 
 (defun linewise-affected-lines-bounds()
   "Return bounds of affected lines.
@@ -83,27 +83,27 @@ bounds are list of two elements,
 where first element is beginning of affected lines,
 second is end of affected lines."
   (let ((lcount (linewise-count-lines-region-with-empty-last)))
-	(if (and (mark) (< (mark) (point)))
-		(cons (line-beginning-position (- 2 lcount)) (line-beginning-position 2))
-	  (cons (line-beginning-position) (line-beginning-position (1+ lcount))))))
+        (if (and (mark) (< (mark) (point)))
+                (cons (line-beginning-position (- 2 lcount)) (line-beginning-position 2))
+          (cons (line-beginning-position) (line-beginning-position (1+ lcount))))))
 
 (defun linewise-call-region-function(region-func)
   "Call REGION-FUNC function with bounds of affected lines as arguments."
   (let ((bounds (linewise-affected-lines-bounds)))
-	(funcall region-func (car bounds) (cdr bounds))))
+        (funcall region-func (car bounds) (cdr bounds))))
 
 (defun linewise-insert-select(str)
   "Insert STR into buffer, and set insertion selected.
 Trailing linefeed is excluded from selection since it would add extra line."
   (let ((l (length str)))
-	(if (= (aref str (- l 1)) ?\n)
-		(setq l (- l 1))
-	  (setq str (concat str "\n")))
-	(insert str)
-	(goto-char (- (point) 1))
-	(when (> (linewise-count-lines-region-with-empty-last) 1)
-	  (setq deactivate-mark nil)
-	  (push-mark (- (point) l) nil t))))
+    (if (= (aref str (- l 1)) ?\n)
+      (setq l (- l 1))
+      (setq str (concat str "\n")))
+    (insert str)
+    (goto-char (- (point) 1))
+    (when (string-match "\n[^\n]*\n" str)
+      (setq deactivate-mark nil)
+      (push-mark (- (point) l) nil t))))
 
 (defun linewise-affected-lines-content()
   "Return substring between affected lines bounds."
@@ -117,8 +117,8 @@ Trailing linefeed is excluded from selection since it would add extra line."
 (defun linewise-copy()
   "Put affected lines to kill ring without deleting."
   (interactive)
-	(linewise-call-region-function 'kill-ring-save)
-	(message "Current line(s) copied to kill ring"))
+        (linewise-call-region-function 'kill-ring-save)
+        (message "Current line(s) copied to kill ring"))
 
 (defun linewise-kill()
   "Kill affected lines."
@@ -136,21 +136,21 @@ Trailing linefeed is excluded from selection since it would add extra line."
 Please do not use for code duplication!"
   (interactive "p")
   (let ((bounds (linewise-affected-lines-bounds))
-		(start)
-		(finish)
-		(substr))
-	(when (or (not arg) (< arg 1)) (setq arg 1))
-	(setq start (car bounds))
-	(setq finish (cdr bounds))
-	(setq substr (buffer-substring start finish))
-	(goto-char finish)
-	(when (not (= ?\n (char-before finish)))
-	  (insert "\n"))
-	(while (> arg 0)
-	  (linewise-insert-select substr)
-	  (setq arg (- arg 1))
-	  (when (> arg 0)
-		(right-char)))))
+                (start)
+                (finish)
+                (substr))
+        (when (or (not arg) (< arg 1)) (setq arg 1))
+        (setq start (car bounds))
+        (setq finish (cdr bounds))
+        (setq substr (buffer-substring start finish))
+        (goto-char finish)
+        (when (not (= ?\n (char-before finish)))
+          (insert "\n"))
+        (while (> arg 0)
+          (linewise-insert-select substr)
+          (setq arg (- arg 1))
+          (when (> arg 0)
+                (right-char)))))
 
 (defun linewise-narrow()
   "Narrow buffer to selected lines."
@@ -173,12 +173,12 @@ are inserted without selection, so consequent usage of
 the command doesn't mix lines.  Please do not use for code duplication!"
   (interactive)
   (let ((content (linewise-affected-lines-content)))
-	(other-window 1)
-	(beginning-of-line)
-	(if keep-window
-		;; When keeping window, next copying of lines should after these lines, but not in between.
-		(progn (insert content) (other-window -1))
-	  (linewise-insert-select content))))
+        (other-window 1)
+        (beginning-of-line)
+        (if keep-window
+                ;; When keeping window, next copying of lines should after these lines, but not in between.
+                (progn (insert content) (other-window -1))
+          (linewise-insert-select content))))
 
 (defun linewise-move-up-or-down(arg)
   "Shift lines affected by selection ARG lines down.
@@ -196,19 +196,19 @@ otherwise moved lines stay selected from beginning to end.
   (setq substr-end (cdr substr-bounds))
   (defvar move-possible)
   (save-excursion
-	(if (> arg 0)
-		(progn (goto-char substr-end)
-			   (setq move-possible (and (not (eobp))
-										(= (count-lines (point) (line-beginning-position (1+ arg))) arg))))
-	  (progn (goto-char substr-beginning)
-			 (setq move-possible (= (count-lines (line-beginning-position arg) (point)) (- 1 arg))))))
+        (if (> arg 0)
+                (progn (goto-char substr-end)
+                           (setq move-possible (and (not (eobp))
+                                                                                (= (count-lines (point) (line-beginning-position (1+ arg))) arg))))
+          (progn (goto-char substr-beginning)
+                         (setq move-possible (= (count-lines (line-beginning-position arg) (point)) (- 1 arg))))))
 
   ;; Don't move if we are already at bounds of the buffer.
   (when move-possible
-	(setq sub-str (buffer-substring substr-beginning substr-end))
-	(delete-region substr-beginning substr-end)
-	(move-beginning-of-line (if (> arg 0) (1+ arg) arg))
-	(linewise-insert-select sub-str)))
+        (setq sub-str (buffer-substring substr-beginning substr-end))
+        (delete-region substr-beginning substr-end)
+        (move-beginning-of-line (if (> arg 0) (1+ arg) arg))
+        (linewise-insert-select sub-str)))
 
 (defun linewise-move-up()
   "Call `linewise-move-up-or-down' with 0 argument."
